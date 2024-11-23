@@ -7,7 +7,7 @@
     <script async src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: Arial, sans-serif;
             background-color: #1b1b1b;
             color: white;
             text-align: center;
@@ -57,40 +57,72 @@
         <h2>Профиль пользователя</h2>
         <img id="avatar" src="" alt="Аватар" />
         <p>Имя: <span id="username"></span></p>
+        <p>ID: <span id="userId"></span></p>
         <p>Баланс: <span id="balance"></span>₽</p>
         <button onclick="backToMenu()">Назад</button>
     </div>
 
-    <div id="shop" class="section hidden">Магазин</div>
-    <div id="earn" class="section hidden">Заработать</div>
-    <div id="bonus" class="section hidden">Бонус</div>
-    <div id="faq" class="section hidden">FAQ</div>
+    <div id="shop" class="section hidden">
+        <h2>Магазин</h2>
+        <p>Добро пожаловать в наш магазин! Здесь вы можете покупать различные товары.</p>
+        <button onclick="alert('Товар добавлен в корзину!')">Купить товар</button>
+    </div>
+
+    <div id="earn" class="section hidden">
+        <h2>Заработать</h2>
+        <p>Здесь вы можете узнать, как заработать деньги.</p>
+    </div>
+
+    <div id="bonus" class="section hidden">
+        <h2>Бонусы</h2>
+        <p>Промо-акции и бонусы для наших пользователей!</p>
+    </div>
+
+    <div id="faq" class="section hidden">
+        <h2>FAQ</h2>
+        <p>Часто задаваемые вопросы.</p>
+    </div>
 
     <script>
         const tg = window.Telegram.WebApp;
 
+        // Функция загрузки данных пользователя
         const loadUserData = () => {
             const user = tg.initDataUnsafe.user;
             if (user) {
                 document.getElementById('username').innerText = user.first_name + (user.last_name ? ' ' + user.last_name : '');
+                document.getElementById('userId').innerText = user.id; // ID пользователя
                 document.getElementById('balance').innerText = "1000"; // Здесь можно интегрировать свою БД
-                document.getElementById('avatar').src = user.photo_url || 'default-avatar-url'; // Укажите URL по умолчанию, если аватар отсутствует
+                document.getElementById('avatar').src = user.photo_url || 'default-avatar-url.jpg'; // Замените на URL по умолчанию
             }
         };
 
+        // Показать профиль
         const showProfile = () => {
             loadUserData();
             document.getElementById('profile').classList.remove('hidden');
-            document.querySelectorAll('.section:not(#profile)').forEach(section => section.classList.add('hidden'));
+            hideAllSectionsExcept('profile');
         };
 
-        const showSection = (section) => {
-            document.getElementById(section).classList.remove('hidden');
-            document.querySelectorAll('.section:not(#' + section + ')').forEach(sec => sec.classList.add('hidden'));
+        // Показать другую секцию
+        const showSection = (sectionId) => {
+            document.getElementById(sectionId).classList.remove('hidden');
+            hideAllSectionsExcept(sectionId);
         };
 
+        // Скрыть все секции, кроме указанной
+        const hideAllSectionsExcept = (sectionId) => {
+            const sections = ['shop', 'earn', 'bonus', 'faq', 'profile'];
+            sections.forEach(section => {
+                document.getElementById(section).classList.add('hidden');
+            });
+            document.getElementById(sectionId).classList.remove('hidden');
+        };
+
+        // Вернуться к меню
         const backToMenu = () => {
-            document.getElementById('profile').classList.add('hidden');
+            document.getElementById('profile').classList.add('hidden'); // Скрываем профиль
+            showSection('shop'); // Показать магазин по умолчанию
         };
 
         // Инициализация
