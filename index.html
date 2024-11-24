@@ -3,132 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Телега Казино</title>
+    <title>Казино Telegram Web App</title>
+    <link rel="stylesheet" href="style.css">
     <script async src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #1b1b1b;
-            color: white;
-            text-align: center;
-            margin: 0;
-        }
-        .menu {
-            display: flex;
-            justify-content: space-around;
-            padding: 10px;
-            background-color: #222;
-        }
-        .menu-btn {
-            background-color: #e91e63;
-            border: none;
-            padding: 10px;
-            border-radius: 5px;
-            color: white;
-            cursor: pointer;
-            flex-basis: 18%;
-        }
-        .menu-btn:hover {
-            background-color: #d81b60;
-        }
-        .section {
-            margin-top: 20px;
-        }
-        .hidden {
-            display: none;
-        }
-        #avatar {
-            border-radius: 50%;
-            width: 100px;
-            height: 100px;
-        }
-    </style>
 </head>
 <body>
-    <div class="menu">
-        <button class="menu-btn" onclick="showSection('shop')">🛒 Магазин</button>
-        <button class="menu-btn" onclick="showProfile()">👤 Профиль</button>
-        <button class="menu-btn" onclick="showSection('earn')">💰 Заработать</button>
-        <button class="menu-btn" onclick="showSection('bonus')">🎁 Бонус</button>
-        <button class="menu-btn" onclick="showSection('faq')">❓ FAQ</button>
+    <div class="container">
+        <h1>Добро пожаловать в Казино!</h1>
+        <div id="main-content">
+            <!-- Здесь будет контент страницы -->
+        </div>
+        <div class="menu">
+            <button class="menu-btn" onclick="showSection('shop')">🛒 Магазин</button>
+            <button class="menu-btn" onclick="showProfile()">👤 Профиль</button>
+            <button class="menu-btn" onclick="showSection('earn')">💰 Заработать</button>
+            <button class="menu-btn" onclick="showSection('other')">🎲 Прочее</button>
+        </div>
     </div>
 
-    <div id="profile" class="section hidden">
-        <h2>Профиль пользователя</h2>
-        <img id="avatar" src="" alt="Аватар" />
-        <p>Имя: <span id="username"></span></p>
-        <p>ID: <span id="userId"></span></p>
-        <p>Баланс: <span id="balance"></span>₽</p>
-        <button onclick="backToMenu()">Назад</button>
-    </div>
-
-    <div id="shop" class="section hidden">
-        <h2>Магазин</h2>
-        <p>Добро пожаловать в наш магазин! Здесь вы можете покупать различные товары.</p>
-        <button onclick="alert('Товар добавлен в корзину!')">Купить товар</button>
-    </div>
-
-    <div id="earn" class="section hidden">
-        <h2>Заработать</h2>
-        <p>Здесь вы можете узнать, как заработать деньги.</p>
-    </div>
-
-    <div id="bonus" class="section hidden">
-        <h2>Бонусы</h2>
-        <p>Промо-акции и бонусы для наших пользователей!</p>
-    </div>
-
-    <div id="faq" class="section hidden">
-        <h2>FAQ</h2>
-        <p>Часто задаваемые вопросы.</p>
-    </div>
-
-    <script>
-        const tg = window.Telegram.WebApp;
-
-        // Функция загрузки данных пользователя
-        const loadUserData = () => {
-            const user = tg.initDataUnsafe.user;
-            if (user) {
-                document.getElementById('username').innerText = user.first_name + (user.last_name ? ' ' + user.last_name : '');
-                document.getElementById('userId').innerText = user.id; // ID пользователя
-                document.getElementById('balance').innerText = "1000"; // Здесь можно интегрировать свою БД
-                document.getElementById('avatar').src = user.photo_url || 'default-avatar-url.jpg'; // Замените на URL по умолчанию
-            }
-        };
-
-        // Показать профиль
-        const showProfile = () => {
-            loadUserData();
-            document.getElementById('profile').classList.remove('hidden');
-            hideAllSectionsExcept('profile');
-        };
-
-        // Показать другую секцию
-        const showSection = (sectionId) => {
-            document.getElementById(sectionId).classList.remove('hidden');
-            hideAllSectionsExcept(sectionId);
-        };
-
-        // Скрыть все секции, кроме указанной
-        const hideAllSectionsExcept = (sectionId) => {
-            const sections = ['shop', 'earn', 'bonus', 'faq', 'profile'];
-            sections.forEach(section => {
-                document.getElementById(section).classList.add('hidden');
-            });
-            document.getElementById(sectionId).classList.remove('hidden');
-        };
-
-        // Вернуться к меню
-        const backToMenu = () => {
-            document.getElementById('profile').classList.add('hidden'); // Скрываем профиль
-            showSection('shop'); // Показать магазин по умолчанию
-        };
-
-        // Инициализация
-        document.addEventListener('DOMContentLoaded', () => {
-            showSection('shop'); // Показываем магазин по умолчанию
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
