@@ -15,42 +15,49 @@
             font-family: Arial, sans-serif;
             height: 100vh;
             margin: 0;
-            position: relative; /* для позиционирования кнопки */
+            position: relative;
+            background-color: #f0f2f5; /* Светлый фон для страницы */
         }
         #toggleProfile {
-            position: absolute; /* фиксируем кнопку в верхнем правом углу */
+            position: absolute;
             top: 10px;
             right: 10px;
-            background: transparent;
-            border: none;
+            background: #ffffff; /* Белый фон для кнопки */
+            border: 1px solid #ccc;
+            border-radius: 25px;
+            padding: 5px 10px;
+            display: flex;
+            align-items: center; /* Выравнивание по центру */
             cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
         #usercard {
             margin-top: 60px; /* отступ для профиля */
             border: 1px solid #ccc;
-            padding: 15px;
-            border-radius: 5px;
+            border-radius: 8px;
             width: 90%;
             max-width: 500px;
             text-align: center;
             display: none; /* скрываем профиль по умолчанию */
-            position: absolute; /* позиционируем пользовательский профиль */
-            top: 50px; /* отступ сверху */
-            z-index: 10; /* создаем слой над другими элементами */
-            background: white; /* цвет фона профиля */
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: absolute;
+            top: 60px; /* отступ сверху для профиля */
+            z-index: 10;
+            background: white;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         }
         #usercard img {
             width: 80px;
             height: 80px;
             border-radius: 50%;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            border: 2px solid #007bff; /* Ободок для изображения */
         }
         .nav-menu {
             display: flex;
             justify-content: space-around;
             align-items: center;
-            background-color: #f8f8f8;
+            background-color: #ffffff;
             padding: 10px 0;
             position: fixed;
             bottom: 0;
@@ -68,6 +75,7 @@
         }
         .nav-menu i {
             font-size: 24px;
+            margin-bottom: 5px; /* Отступ под иконкой */
         }
         .balance {
             display: flex;
@@ -83,17 +91,20 @@
             #usercard {
                 width: 95%;
             }
+            #toggleProfile {
+                padding: 4px 8px;
+            }
         }
     </style>
 </head>
 <body>
-    <button id="toggleProfile">
+    <button id="toggleProfile" title="Открыть профиль">
         <img src="" alt="Avatar" id="userAvatar" style="width: 40px; height: 40px; border-radius: 50%;">
-        <i class="fas fa-chevron-down" id="arrowIcon"></i>
         <div class="balance" id="balanceDisplay">
             <i class="fas fa-coins"></i>
             <span id="balanceAmount">0</span> <!-- Здесь будет отображаться баланс -->
         </div>
+        <i class="fas fa-chevron-down" id="arrowIcon"></i>
     </button>
     <div id="usercard">
         <!-- Данные пользователя будут выведены здесь -->
@@ -112,14 +123,15 @@
 
         function displayUserData(user) {
             const userCard = document.getElementById('usercard');
-            userCard.innerHTML = \`
+            userCard.innerHTML = `
                 <img src="${user.photo_url}" alt="User Photo">
                 <h3>${user.first_name} ${user.last_name || ''}</h3>
                 <p><strong>ID:</strong> ${user.id}</p>
                 <p><strong>Пользователь:</strong> ${user.username || 'Не указан'}</p>
                 <p><strong>Баланс:</strong> ${user.balance} ₽</p>
                 <button onclick="closeProfile()">Закрыть</button>
-            \`;
+            `;
+            document.getElementById('userAvatar').src = user.photo_url; // Устанавливаем аватар пользователя
             document.getElementById('balanceAmount').innerText = user.balance; // Отображаем баланс
         }
 
@@ -140,7 +152,6 @@
             };
 
             // Установка аватара и отображение данных
-            document.getElementById('userAvatar').src = photoUrl;
             displayUserData(user);
         }
 
