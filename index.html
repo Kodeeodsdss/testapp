@@ -69,6 +69,16 @@
         .nav-menu i {
             font-size: 24px;
         }
+        .balance {
+            display: flex;
+            align-items: center;
+            margin-left: 10px;
+            color: #333;
+        }
+        .balance i {
+            font-size: 20px;
+            margin-right: 5px;
+        }
         @media (max-width: 600px) {
             #usercard {
                 width: 95%;
@@ -80,6 +90,10 @@
     <button id="toggleProfile">
         <img src="" alt="Avatar" id="userAvatar" style="width: 40px; height: 40px; border-radius: 50%;">
         <i class="fas fa-chevron-down" id="arrowIcon"></i>
+        <div class="balance" id="balanceDisplay">
+            <i class="fas fa-coins"></i>
+            <span id="balanceAmount">0</span> <!-- Здесь будет отображаться баланс -->
+        </div>
     </button>
     <div id="usercard">
         <!-- Данные пользователя будут выведены здесь -->
@@ -98,14 +112,15 @@
 
         function displayUserData(user) {
             const userCard = document.getElementById('usercard');
-            userCard.innerHTML = `
+            userCard.innerHTML = \`
                 <img src="${user.photo_url}" alt="User Photo">
                 <h3>${user.first_name} ${user.last_name || ''}</h3>
                 <p><strong>ID:</strong> ${user.id}</p>
                 <p><strong>Пользователь:</strong> ${user.username || 'Не указан'}</p>
                 <p><strong>Баланс:</strong> ${user.balance} ₽</p>
                 <button onclick="closeProfile()">Закрыть</button>
-            `;
+            \`;
+            document.getElementById('balanceAmount').innerText = user.balance; // Отображаем баланс
         }
 
         function getUserData() {
@@ -113,7 +128,7 @@
             const firstName = tg.initDataUnsafe.user.first_name;
             const lastName = tg.initDataUnsafe.user.last_name;
             const username = tg.initDataUnsafe.user.username;
-            const photoUrl = tg.initDataUnsafe.user.photo_url || ''; // Замените на актуальную ссылку на фото
+            const photoUrl = tg.initDataUnsafe.user.photo_url || ''; // Замена на актуальную ссылку на фото
 
             const user = {
                 id: userId,
