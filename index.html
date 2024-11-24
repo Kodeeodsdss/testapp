@@ -62,7 +62,9 @@
     </style>
 </head>
 <body>
-    <div id="usercard"></div>
+    <div id="usercard">
+        <!-- Данные пользователя будут выведены здесь -->
+    </div>
 
     <div class="nav-menu">
         <a href="#" id="profileLink">
@@ -79,50 +81,45 @@
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        // Функция получения данных пользователя
-        function fetchUserData() {
-            const userId = tg.initDataUnsafe.user.id.toString();
-            const firstName = tg.initDataUnsafe.user.first_name || '';
-            const lastName = tg.initDataUnsafe.user.last_name || '';
-            const username = tg.initDataUnsafe.user.username || '';
-
-            fetch('http://localhost:5000/user', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ userId, firstName, lastName, username })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Ошибка сети');
-                }
-                return response.json();
-            })
-            .then(data => {
-                const avatarUrl = data.avatarUrl; // Получите URL аватара из ответа
-                displayUserInfo(data, avatarUrl);
-            })
-            .catch(err => {
-                console.error(err);
-                document.getElementById("usercard").innerHTML = `<p>Ошибка загрузки данных</p>`;
-            });
-        }
-
-        // Функция отображения информации пользователя
-        function displayUserInfo(user, avatarUrl) {
-            const usercard = document.getElementById("usercard");
-            usercard.innerHTML = `
-                <img src="${avatarUrl || 'https://via.placeholder.com/80'}" alt="Аватар пользователя">
-                <p>Имя: ${user.firstName}</p>
-                <p>Фамилия: ${user.lastName}</p>
-                <p>UserID: ${user.userId}</p>
-                <p>Баланс: ${user.balance} монет</p>
+        function displayUserData(user) {
+            const userCard = document.getElementById('usercard');
+            userCard.innerHTML = `
+                <img src="${user.photo_url}" alt="User Photo">
+                <h3>${user.first_name} ${user.last_name || ''}</h3>
+                <p><strong>ID:</strong> ${user.id}</p>
+                <p><strong>Пользователь:</strong> ${user.username || 'Не указан'}</p>
+                <p><strong>Баланс:</strong> ${user.balance} ₽</p>
             `;
-            usercard.style.display = "block";
         }
-        // Вызываем fetchUserData сразу после загрузки страницы
-        fetchUserData();
+
+        // Получение данных пользователя из Telegram
+        function getUserData() {
+            const userId = tg.initDataUnsafe.user.id;
+            const firstName = tg.initDataUnsafe.user.first_name;
+            const lastName = tg.initDataUnsafe.user.last_name;
+            const username = tg.initDataUnsafe.user.username;
+            const photoUrl = tg.initDataUnsafe.user.photo_url || ''; // Замените на актуальную ссылку на фото
+
+            // Формируем объект пользователя
+            const user = {
+                id: userId,
+                first_name: firstName,
+                last_name: lastName,
+                username: username,
+                photo_url: photoUrl,
+                balance: 1000 // Задаем начальный баланс или получаем его из базы данных
+            };
+
+            // Отображаем данные
+            displayUserData(user);
+        }
+
+        document.getElementById('profileLink').addEventListener('click', function() {
+            getUserData();
+        });
+
+        // Используем для отображения данных при загрузке
+        getUserData();
     </script>
 </body>
 </html>
