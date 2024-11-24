@@ -2,30 +2,127 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Казино Telegram Web App</title>
-    <link rel="stylesheet" href="style.css">
-    <script async src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>Telegram Web App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            margin: 0;
+        }
+        #usercard {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 15px;
+            border-radius: 5px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+        }
+        #usercard img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+        .nav-menu {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background-color: #f8f8f8;
+            padding: 10px 0;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            border-top: 1px solid #ccc;
+            box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1);
+        }
+        .nav-menu a {
+            text-decoration: none;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .nav-menu i {
+            font-size: 24px;
+        }
+        @media (max-width: 600px) {
+            #usercard {
+                width: 95%;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Добро пожаловать в Казино!</h1>
-        <div id="user-info">
-            <!-- Здесь будут отображаться данные пользователя -->
-        </div>
-        <div id="main-content">
-            <div id="shop"></div>
-            <div id="earn"></div>
-            <div id="other"></div>
-        </div>
-        <div class="menu">
-            <button class="menu-btn" onclick="showSection('shop')">🛒 Магазин</button>
-            <button class="menu-btn" onclick="showProfile()">👤 Профиль</button>
-            <button class="menu-btn" onclick="showSection('earn')">💰 Заработать</button>
-            <button class="menu-btn" onclick="showSection('other')">🎲 Прочее</button>
-        </div>
+    <div id="usercard"></div>
+
+    <div class="nav-menu">
+        <a href="#" id="profileLink">
+            <i class="fas fa-user"></i>
+            Профиль
+        </a>
+        <a href="#" id="bonusLink">
+            <i class="fas fa-gift"></i>
+            Бонусы
+        </a>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+
+        // Функция получения данных пользователя
+        function fetchUserData() {
+            const userId = tg.initDataUnsafe.user.id.toString();
+            const firstName = tg.initDataUnsafe.user.first_name || '';
+            const lastName = tg.initDataUnsafe.user.last_name || '';
+            const username = tg.initDataUnsafe.user.username || '';
+
+            fetch('http://localhost:5000/user', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ userId, firstName, lastName, username })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Ошибка сети');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const avatarUrl = data.avatarUrl; // Получите URL аватара из ответа
+                displayUserInfo(data, avatarUrl);
+            })
+            .catch(err => {
+                console.error(err);
+                document.getElementById("usercard").innerHTML = `<p>Ошибка загрузки данных</p>`;
+            });
+        }
+
+        // Функция отображения информации пользователя
+        function displayUserInfo(user, avatarUrl) {
+            const usercard = document.getElementById("usercard");
+            usercard.innerHTML = `
+                <img src="${avatarUrl || 'https://via.placeholder.com/80'}" alt="Аватар пользователя">
+                <p>Имя: ${user.firstName}</p>
+                <p>Фамилия: ${user.lastName}</p>
+                <p>UserID: ${user.userId}</p>
+                <p>Баланс: ${user.balance} монет</p>
+            `;
+            usercard.style.display = "block";
+        }
+        // Вызываем fetchUserData сразу после загрузки страницы
+        fetchUserData();
+    </script>
 </body>
 </html>
