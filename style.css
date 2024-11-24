@@ -38,6 +38,10 @@ body {
     background-color: #c0392b;
 }
 
+#user-info {
+    margin: 20px 0;
+}
+
 .section {
     display: none;
 }
