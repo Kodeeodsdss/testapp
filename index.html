@@ -15,15 +15,30 @@
             font-family: Arial, sans-serif;
             height: 100vh;
             margin: 0;
+            position: relative; /* для позиционирования кнопки */
+        }
+        #toggleProfile {
+            position: absolute; /* фиксируем кнопку в верхнем правом углу */
+            top: 10px;
+            right: 10px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
         }
         #usercard {
-            margin-top: 20px;
+            margin-top: 60px; /* отступ для профиля */
             border: 1px solid #ccc;
             padding: 15px;
             border-radius: 5px;
             width: 90%;
             max-width: 500px;
             text-align: center;
+            display: none; /* скрываем профиль по умолчанию */
+            position: absolute; /* позиционируем пользовательский профиль */
+            top: 50px; /* отступ сверху */
+            z-index: 10; /* создаем слой над другими элементами */
+            background: white; /* цвет фона профиля */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
         #usercard img {
             width: 80px;
@@ -62,15 +77,15 @@
     </style>
 </head>
 <body>
+    <button id="toggleProfile">
+        <img src="" alt="Avatar" id="userAvatar" style="width: 40px; height: 40px; border-radius: 50%;">
+        <i class="fas fa-chevron-down" id="arrowIcon"></i>
+    </button>
     <div id="usercard">
         <!-- Данные пользователя будут выведены здесь -->
     </div>
 
     <div class="nav-menu">
-        <a href="#" id="profileLink">
-            <i class="fas fa-user"></i>
-            Профиль
-        </a>
         <a href="#" id="bonusLink">
             <i class="fas fa-gift"></i>
             Бонусы
@@ -89,10 +104,10 @@
                 <p><strong>ID:</strong> ${user.id}</p>
                 <p><strong>Пользователь:</strong> ${user.username || 'Не указан'}</p>
                 <p><strong>Баланс:</strong> ${user.balance} ₽</p>
+                <button onclick="closeProfile()">Закрыть</button>
             `;
         }
 
-        // Получение данных пользователя из Telegram
         function getUserData() {
             const userId = tg.initDataUnsafe.user.id;
             const firstName = tg.initDataUnsafe.user.first_name;
@@ -100,7 +115,6 @@
             const username = tg.initDataUnsafe.user.username;
             const photoUrl = tg.initDataUnsafe.user.photo_url || ''; // Замените на актуальную ссылку на фото
 
-            // Формируем объект пользователя
             const user = {
                 id: userId,
                 first_name: firstName,
@@ -110,12 +124,27 @@
                 balance: 1000 // Задаем начальный баланс или получаем его из базы данных
             };
 
-            // Отображаем данные
+            // Установка аватара и отображение данных
+            document.getElementById('userAvatar').src = photoUrl;
             displayUserData(user);
         }
 
-        document.getElementById('profileLink').addEventListener('click', function() {
-            getUserData();
+        function toggleProfile() {
+            const userCard = document.getElementById('usercard');
+            if (userCard.style.display === 'none' || userCard.style.display === '') {
+                userCard.style.display = 'block'; // Показываем профиль
+            } else {
+                userCard.style.display = 'none'; // Скрываем профиль
+            }
+        }
+
+        function closeProfile() {
+            document.getElementById('usercard').style.display = 'none'; // Закрываем профиль
+        }
+
+        document.getElementById('toggleProfile').addEventListener('click', toggleProfile);
+        document.getElementById('bonusLink').addEventListener('click', function() {
+            alert('Здесь будут доступны бонусы!'); // Пример действия для кнопки бонусов
         });
 
         // Используем для отображения данных при загрузке
