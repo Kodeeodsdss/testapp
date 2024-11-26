@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telegram Web App</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
             display: flex;
@@ -16,6 +14,7 @@
             height: 100vh;
             margin: 0;
         }
+
         #usercard {
             margin-top: 20px;
             border: 1px solid #ccc;
@@ -25,12 +24,14 @@
             max-width: 500px;
             text-align: center;
         }
+
         #usercard img {
             width: 80px;
             height: 80px;
             border-radius: 50%;
             margin-bottom: 10px;
         }
+
         .nav-menu {
             display: flex;
             justify-content: space-around;
@@ -44,6 +45,7 @@
             border-top: 1px solid #ccc;
             box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1);
         }
+
         .nav-menu a {
             text-decoration: none;
             color: #333;
@@ -51,29 +53,15 @@
             flex-direction: column;
             align-items: center;
         }
-        .nav-menu i {
-            font-size: 24px;
-        }
-        @media (max-width: 600px) {
-            #usercard {
-                width: 95%;
-            }
-        }
     </style>
 </head>
+
 <body>
-    <div id="usercard">
-        <!-- Данные пользователя будут выведены здесь -->
-    </div>
+    <div id="usercard"></div>
 
     <div class="nav-menu">
         <a href="#" id="profileLink">
-            <i class="fas fa-user"></i>
             Профиль
-        </a>
-        <a href="#" id="bonusLink">
-            <i class="fas fa-gift"></i>
-            Бонусы
         </a>
     </div>
 
@@ -81,45 +69,45 @@
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        function displayUserData(user) {
+        async function displayUserData(user) {
             const userCard = document.getElementById('usercard');
             userCard.innerHTML = `
                 <img src="${user.photo_url}" alt="User Photo">
-                <h3>${user.first_name} ${user.last_name || ''}</h3>
-                <p><strong>ID:</strong> ${user.id}</p>
+                <h3>${user.firstName} ${user.lastName || ''}</h3>
+                <p><strong>ID:</strong> ${user.userId}</p>
                 <p><strong>Пользователь:</strong> ${user.username || 'Не указан'}</p>
                 <p><strong>Баланс:</strong> ${user.balance} ₽</p>
             `;
         }
 
-        // Получение данных пользователя из Telegram
-        function getUserData() {
+        async function getUserData() {
             const userId = tg.initDataUnsafe.user.id;
-            const firstName = tg.initDataUnsafe.user.first_name;
-            const lastName = tg.initDataUnsafe.user.last_name;
-            const username = tg.initDataUnsafe.user.username;
-            const photoUrl = tg.initDataUnsafe.user.photo_url || ''; // Замените на актуальную ссылку на фото
+            const serverUrl = 'http://localhost:5000/user'; // Замените на URL вашего сервера
 
-            // Формируем объект пользователя
-            const user = {
-                id: userId,
-                first_name: firstName,
-                last_name: lastName,
-                username: username,
-                photo_url: photoUrl,
-                balance: 1000 // Задаем начальный баланс или получаем его из базы данных
-            };
+            const response = await fetch(serverUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: userId,
+                    firstName: tg.initDataUnsafe.user.first_name,
+                    lastName: tg.initDataUnsafe.user.last_name || '',
+                    username: tg.initDataUnsafe.user.username || '',
+                })
+            });
 
-            // Отображаем данные
-            displayUserData(user);
+            if (response.ok) {
+                const user = await response.json();
+                displayUserData(user);
+            } else {
+                alert('Ошибка загрузки данных пользователя.');
+            }
         }
 
-        document.getElementById('profileLink').addEventListener('click', function() {
-            getUserData();
-        });
+        document.getElementById('profileLink').addEventListener('click', getUserData);
 
-        // Используем для отображения данных при загрузке
+        // Вызов функции при загрузке приложения
         getUserData();
     </script>
 </body>
+
 </html>
