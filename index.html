@@ -69,13 +69,13 @@
 
         async function displayUserData(user) {
             const userCard = document.getElementById('usercard');
-            userCard.innerHTML = \`
+            userCard.innerHTML = `
                 <img src="${user.photo_url}" alt="User Photo">
                 <h3>${user.firstName} ${user.lastName || ''}</h3>
                 <p><strong>ID:</strong> ${user.userId}</p>
                 <p><strong>Пользователь:</strong> ${user.username || 'Не указан'}</p>
                 <p><strong>Баланс:</strong> ${user.balance} ₽</p>
-            \`;
+            `;
         }
 
         async function getUserData() {
