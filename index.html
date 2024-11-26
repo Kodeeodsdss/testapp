@@ -81,7 +81,7 @@
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        function displayUserData(user) {
+        async function displayUserData(user) {
             const userCard = document.getElementById('usercard');
             userCard.innerHTML = `
                 <img src="${user.photo_url}" alt="User Photo">
@@ -92,31 +92,48 @@
             `;
         }
 
-        // Получение данных пользователя из Telegram
-        function getUserData() {
+        async function getUserData() {
             const userId = tg.initDataUnsafe.user.id;
-            const firstName = tg.initDataUnsafe.user.first_name;
-            const lastName = tg.initDataUnsafe.user.last_name;
-            const username = tg.initDataUnsafe.user.username;
-            const photoUrl = tg.initDataUnsafe.user.photo_url || ''; // Замените на актуальную ссылку на фото
 
-            // Формируем объект пользователя
-            const user = {
-                id: userId,
-                first_name: firstName,
-                last_name: lastName,
-                username: username,
-                photo_url: photoUrl,
-                balance: 0 // Задаем начальный баланс или получаем его из базы данных
-            };
+            // Запрос данных пользователя
+            try {
+                const response = await fetch(`http://localhost:3000/api/users/${userId}`);
 
-            // Отображаем данные
-            displayUserData(user);
+                if (response.ok) {
+                    const user = await response.json();
+                    displayUserData(user);
+                } else if (response.status === 404) {
+                    // Если пользователь не найден, создаем нового
+                    const newUser = {
+                        id: userId,
+                        first_name: tg.initDataUnsafe.user.first_name,
+                        last_name: tg.initDataUnsafe.user.last_name || '',
+                        username: tg.initDataUnsafe.user.username || '',
+                        photo_url: tg.initDataUnsafe.user.photo_url || '',
+                        balance: 1000 // Начальный баланс
+                    };
+
+                    const addUserResponse = await fetch(`http://localhost:3000/api/users`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(newUser)
+                    });
+
+                    if (addUserResponse.ok) {
+                        const addedUser = await addUserResponse.json();
+                        displayUserData(addedUser);
+                    } else {
+                        alert('Ошибка добавления пользователя. Попробуйте позже.');
+                    }
+                } else {
+                    alert('Ошибка загрузки данных. Сервер недоступен.');
+                }
+            } catch (error) {
+                alert('Ошибка соединения с сервером. Попробуйте позже.');
+            }
         }
 
-        document.getElementById('profileLink').addEventListener('click', function() {
-            getUserData();
-        });
+        document.getElementById('profileLink').addEventListener('click', getUserData);
 
         // Используем для отображения данных при загрузке
         getUserData();
