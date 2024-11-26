@@ -62,7 +62,9 @@
     </style>
 </head>
 <body>
-    <div id="usercard"></div>
+    <div id="usercard">
+        <!-- Данные пользователя будут выведены здесь -->
+    </div>
 
     <div class="nav-menu">
         <a href="#" id="profileLink">
@@ -79,7 +81,7 @@
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        async function displayUserData(user) {
+        function displayUserData(user) {
             const userCard = document.getElementById('usercard');
             userCard.innerHTML = `
                 <img src="${user.photo_url}" alt="User Photo">
@@ -90,48 +92,33 @@
             `;
         }
 
-        async function getUserData() {
+        // Получение данных пользователя из Telegram
+        function getUserData() {
             const userId = tg.initDataUnsafe.user.id;
-            const serverUrl = 'http://77.234.18.14:3000'; // Замените на ваш сервер
+            const firstName = tg.initDataUnsafe.user.first_name;
+            const lastName = tg.initDataUnsafe.user.last_name;
+            const username = tg.initDataUnsafe.user.username;
+            const photoUrl = tg.initDataUnsafe.user.photo_url || ''; // Замените на актуальную ссылку на фото
 
-            try {
-                const response = await fetch(`${serverUrl}/api/users/${userId}`);
+            // Формируем объект пользователя
+            const user = {
+                id: userId,
+                first_name: firstName,
+                last_name: lastName,
+                username: username,
+                photo_url: photoUrl,
+                balance: 1000 // Задаем начальный баланс или получаем его из базы данных
+            };
 
-                if (response.ok) {
-                    const user = await response.json();
-                    displayUserData(user);
-                } else if (response.status === 404) {
-                    const newUser = {
-                        id: userId,
-                        first_name: tg.initDataUnsafe.user.first_name,
-                        last_name: tg.initDataUnsafe.user.last_name || '',
-                        username: tg.initDataUnsafe.user.username || '',
-                        photo_url: tg.initDataUnsafe.user.photo_url || '',
-                        balance: 1000 // Начальный баланс
-                    };
-
-                    const addUserResponse = await fetch(`${serverUrl}/api/users`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(newUser)
-                    });
-
-                    if (addUserResponse.ok) {
-                        const addedUser = await addUserResponse.json();
-                        displayUserData(addedUser);
-                    } else {
-                        alert('Ошибка добавления пользователя. Попробуйте позже.');
-                    }
-                } else {
-                    alert('Ошибка загрузки данных. Сервер недоступен.');
-                }
-            } catch (error) {
-                alert('Ошибка соединения с сервером. Попробуйте позже.');
-            }
+            // Отображаем данные
+            displayUserData(user);
         }
 
-        document.getElementById('profileLink').addEventListener('click', getUserData);
+        document.getElementById('profileLink').addEventListener('click', function() {
+            getUserData();
+        });
 
+        // Используем для отображения данных при загрузке
         getUserData();
     </script>
 </body>
