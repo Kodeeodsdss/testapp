@@ -8,7 +8,6 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* Ваши стили остаются без изменений */
         body {
             display: flex;
             flex-direction: column;
@@ -64,6 +63,7 @@
 </head>
 <body>
     <div id="usercard"></div>
+
     <div class="nav-menu">
         <a href="#" id="profileLink">
             <i class="fas fa-user"></i>
@@ -92,7 +92,7 @@
 
         async function getUserData() {
             const userId = tg.initDataUnsafe.user.id;
-            const serverUrl = 'http://77.234.18.14:3000'; // Замените на IP-адрес или домен вашего сервера
+            const serverUrl = 'http://localhost:3000'; // Замените на ваш сервер
 
             try {
                 const response = await fetch(`${serverUrl}/api/users/${userId}`);
@@ -115,6 +115,7 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(newUser)
                     });
+
                     if (addUserResponse.ok) {
                         const addedUser = await addUserResponse.json();
                         displayUserData(addedUser);
@@ -131,7 +132,6 @@
 
         document.getElementById('profileLink').addEventListener('click', getUserData);
 
-        // Используем для отображения данных при загрузке
         getUserData();
     </script>
 </body>
