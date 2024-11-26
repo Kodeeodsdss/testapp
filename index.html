@@ -8,6 +8,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        /* Ваши стили остаются без изменений */
         body {
             display: flex;
             flex-direction: column;
@@ -62,10 +63,7 @@
     </style>
 </head>
 <body>
-    <div id="usercard">
-        <!-- Данные пользователя будут выведены здесь -->
-    </div>
-
+    <div id="usercard"></div>
     <div class="nav-menu">
         <a href="#" id="profileLink">
             <i class="fas fa-user"></i>
@@ -94,16 +92,15 @@
 
         async function getUserData() {
             const userId = tg.initDataUnsafe.user.id;
+            const serverUrl = 'http://77.234.18.14:3000'; // Замените на IP-адрес или домен вашего сервера
 
-            // Запрос данных пользователя
             try {
-                const response = await fetch(`http://localhost:3000/api/users/${userId}`);
+                const response = await fetch(`${serverUrl}/api/users/${userId}`);
 
                 if (response.ok) {
                     const user = await response.json();
                     displayUserData(user);
                 } else if (response.status === 404) {
-                    // Если пользователь не найден, создаем нового
                     const newUser = {
                         id: userId,
                         first_name: tg.initDataUnsafe.user.first_name,
@@ -113,12 +110,11 @@
                         balance: 1000 // Начальный баланс
                     };
 
-                    const addUserResponse = await fetch(`http://localhost:3000/api/users`, {
+                    const addUserResponse = await fetch(`${serverUrl}/api/users`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(newUser)
                     });
-
                     if (addUserResponse.ok) {
                         const addedUser = await addUserResponse.json();
                         displayUserData(addedUser);
