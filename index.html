@@ -12,10 +12,10 @@
             font-family: Arial, sans-serif;
             height: 100vh;
             margin: 0;
+            justify-content: center;
         }
 
         #usercard {
-            margin-top: 20px;
             border: 1px solid #ccc;
             padding: 15px;
             border-radius: 5px;
@@ -33,7 +33,7 @@
     </style>
 </head>
 <body>
-    <div id="usercard"></div>
+    <div id="usercard">Загрузка данных...</div>
 
     <script>
         let tg = window.Telegram.WebApp;
@@ -56,9 +56,7 @@
             const username = tg.initDataUnsafe.user.username || '';
             const avatar = tg.initDataUnsafe.user.photo_url || '';
 
-            const serverUrl = 'http://localhost:5000/user'; // Замените на URL вашего сервера
-            
-            const response = await fetch(serverUrl, {
+            const response = await fetch('http://localhost:5000/user', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
