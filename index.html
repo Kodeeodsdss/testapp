@@ -2,7 +2,6 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telegram Web App</title>
     <style>
         body {
@@ -31,12 +30,13 @@
             margin-bottom: 10px;
         }
     </style>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
     <div id="usercard">Загрузка данных...</div>
 
     <script>
-        let tg = window.Telegram.WebApp;
+        const tg = window.Telegram.WebApp;
 
         async function displayUserData(user) {
             const userCard = document.getElementById('usercard');
@@ -54,19 +54,21 @@
             const firstName = tg.initDataUnsafe.user.first_name;
             const lastName = tg.initDataUnsafe.user.last_name || '';
             const username = tg.initDataUnsafe.user.username || '';
-            const avatar = tg.initDataUnsafe.user.photo_url || '';
+            const avatar = tg.initDataUnsafe.user.photo_url || 'https://via.placeholder.com/80'; // Используйте заглушку если аватар отсутствует
+
+            const userData = {
+                userId,
+                firstName,
+                lastName,
+                username,
+                avatar,
+                balance: 1000 // Начальный баланс
+            };
 
             const response = await fetch('http://localhost:5000/user', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    userId,
-                    firstName,
-                    lastName,
-                    username,
-                    avatar,
-                    balance: 1000 // Задаем начальный баланс
-                })
+                body: JSON.stringify(userData)
             });
 
             if (response.ok) {
@@ -77,6 +79,7 @@
             }
         }
 
+        // Вызываем функцию, чтобы получить и отобразить данные пользователя сразу при загрузке
         getUserData();
     </script>
 </body>
