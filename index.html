@@ -11,7 +11,35 @@
             font-family: Arial, sans-serif;
             height: 100vh;
             margin: 0;
-            justify-content: center;
+        }
+
+        header {
+            width: 100%;
+            background-color: #2c3e50;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            position: relative;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .balance {
+            display: flex;
+            align-items: center;
+        }
+
+        .coin-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
         }
 
         #usercard {
@@ -20,6 +48,9 @@
             border-radius: 5px;
             width: 90%;
             max-width: 500px;
+            margin-top: 20px;
+            background-color: #ecf0f1;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             text-align: center;
         }
 
@@ -29,16 +60,103 @@
             border-radius: 50%;
             margin-bottom: 10px;
         }
+
+        @media (max-width: 600px) {
+            header {
+                flex-direction: column;
+                align-items: start;
+            }
+
+            .avatar, .coin-icon {
+                width: 30px;
+                height: 30px;
+            }
+
+            #usercard {
+                width: 95%;
+            }
+        }
+
+        /* Модальное окно профиля */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.7);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
     </style>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
+    <header>
+        <img id="userAvatar" class="avatar" alt="Avatar">
+        <div class="balance">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/coin-dollar.png" class="coin-icon" alt="Coin">
+            <span id="userBalance">0 ₽</span>
+        </div>
+    </header>
+
     <div id="usercard">Загрузка данных...</div>
+
+    <!-- Модальное окно профиля -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeModal">&times;</span>
+            <h2>Профиль пользователя</h2>
+            <div>
+                <img src="" id="profileAvatar" alt="Avatar" style="width: 80px; height: 80px; border-radius: 50%;">
+            </div>
+            <p><strong>Имя:</strong> <span id="profileName"></span></p>
+            <p><strong>Фамилия:</strong> <span id="profileLastName"></span></p>
+            <p><strong>ID:</strong> <span id="profileId"></span></p>
+            <p><strong>Пользователь:</strong> <span id="profileUsername"></span></p>
+        </div>
+    </div>
 
     <script>
         const tg = window.Telegram.WebApp;
 
         async function displayUserData(user) {
+            document.getElementById('userAvatar').src = user.avatar || 'https://via.placeholder.com/80';
+            document.getElementById('userBalance').innerText = `${user.balance} ₽`;
+            document.getElementById('profileAvatar').src = user.avatar || 'https://via.placeholder.com/80';
+            document.getElementById('profileName').innerText = user.firstName;
+            document.getElementById('profileLastName').innerText = user.lastName || '';
+            document.getElementById('profileId').innerText = user.userId;
+            document.getElementById('profileUsername').innerText = user.username || 'Не указан';
+
             const userCard = document.getElementById('usercard');
             userCard.innerHTML = `
                 <img src="${user.avatar}" alt="Avatar">
@@ -54,7 +172,7 @@
             const firstName = tg.initDataUnsafe.user.first_name;
             const lastName = tg.initDataUnsafe.user.last_name || '';
             const username = tg.initDataUnsafe.user.username || '';
-            const avatar = tg.initDataUnsafe.user.photo_url || 'https://via.placeholder.com/80'; // Используйте заглушку если аватар отсутствует
+            const avatar = tg.initDataUnsafe.user.photo_url || 'https://via.placeholder.com/80';
 
             const userData = {
                 userId,
@@ -79,7 +197,26 @@
             }
         }
 
-        // Вызываем функцию, чтобы получить и отобразить данные пользователя сразу при загрузке
+        // Открытие модального окна профиля
+        const userAvatar = document.getElementById('userAvatar');
+        const modal = document.getElementById('profileModal');
+        const closeModal = document.getElementById('closeModal');
+
+        userAvatar.addEventListener('click', () => {
+            modal.style.display = 'flex';
+        });
+
+        closeModal.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        // Закрыть модальное окно при клике вне его
+        window.onclick = function(event) {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        };
+
         getUserData();
     </script>
 </body>
