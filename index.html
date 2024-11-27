@@ -24,35 +24,24 @@
             text-align: center;
         }
 
-        .nav-menu {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            background-color: #f8f8f8;
-            padding: 10px 0;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            border-top: 1px solid #ccc;
-            box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1);
+        #usercard img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 10px;
         }
     </style>
 </head>
 <body>
     <div id="usercard"></div>
 
-    <div class="nav-menu">
-        <a href="#" id="profileLink">Профиль</a>
-    </div>
-
     <script>
         let tg = window.Telegram.WebApp;
-        tg.expand();
 
         async function displayUserData(user) {
             const userCard = document.getElementById('usercard');
             userCard.innerHTML = `
+                <img src="${user.avatar}" alt="Avatar">
                 <h3>${user.firstName} ${user.lastName || ''}</h3>
                 <p><strong>ID:</strong> ${user.userId}</p>
                 <p><strong>Пользователь:</strong> ${user.username || 'Не указан'}</p>
@@ -62,16 +51,23 @@
 
         async function getUserData() {
             const userId = tg.initDataUnsafe.user.id;
-            const serverUrl = 'http://localhost:5000/user';
+            const firstName = tg.initDataUnsafe.user.first_name;
+            const lastName = tg.initDataUnsafe.user.last_name || '';
+            const username = tg.initDataUnsafe.user.username || '';
+            const avatar = tg.initDataUnsafe.user.photo_url || '';
 
+            const serverUrl = 'http://localhost:5000/user'; // Замените на URL вашего сервера
+            
             const response = await fetch(serverUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    userId: userId,
-                    firstName: tg.initDataUnsafe.user.first_name,
-                    lastName: tg.initDataUnsafe.user.last_name || '',
-                    username: tg.initDataUnsafe.user.username || '',
+                    userId,
+                    firstName,
+                    lastName,
+                    username,
+                    avatar,
+                    balance: 1000 // Задаем начальный баланс
                 })
             });
 
@@ -83,9 +79,6 @@
             }
         }
 
-        document.getElementById('profileLink').addEventListener('click', getUserData);
-
-        // Вызов функции при загрузке приложения
         getUserData();
     </script>
 </body>
