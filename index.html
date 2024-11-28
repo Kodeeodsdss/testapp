@@ -3,36 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Web App</title>
+    <title>Профиль пользователя</title>
     <style>
         body {
+            font-family: 'Arial', sans-serif;
+            background-color: #1c1c1c;
+            color: #f0f0f0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            font-family: Arial, sans-serif;
+            justify-content: center;
             height: 100vh;
             margin: 0;
-            background-image: url('https://i.pinimg.com/originals/57/e1/d3/57e1d3c3b3eabe771fbbc25364e720cc.jpg'); /* Замените на URL вашей фоновый картинки */
-            background-size: cover;
-            background-position: center;
-            color: white; /* Цвет текста */
+            position: relative;
         }
 
         header {
             width: 100%;
-            background-color: #262221; /* Полупрозрачный фон */
-            color: white;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px;
+            padding: 15px;
+            background-color: #2b2b2b;
+            border-bottom: 1px solid #444;
         }
 
         .avatar {
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
-            cursor: pointer;
             border: 2px solid white;
         }
 
@@ -42,46 +41,40 @@
         }
 
         .coin-icon {
-            width: 20px;
-            height: 20px;
+            width: 25px;
             margin-right: 5px;
         }
 
         #usercard {
-            border: 1px solid #ccc;
-            padding: 15px;
-            border-radius: 5px;
             width: 90%;
-            max-width: 500px;
-            margin-top: 20px;
-            background-color: rgba(236, 240, 241, 0.9);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            padding: 20px;
             text-align: center;
-            color: #2c3e50; /* Цвет текста в карточке */
+            background-color: #2b2b2b;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none; /* Initially hidden */
         }
 
-        /* Модальное окно профиля */
         .modal {
             display: none;
             position: fixed;
-            z-index: 1000;
+            z-index: 1;
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
-            overflow: auto;
             background-color: rgba(0, 0, 0, 0.8);
-            justify-content: center;
-            align-items: center;
+            padding-top: 60px;
         }
 
         .modal-content {
             background-color: #fefefe;
+            margin: 5% auto;
             padding: 20px;
-            border-radius: 5px;
+            border: 1px solid #888;
             width: 80%;
-            max-width: 400px;
-            text-align: center;
+            color: black;
         }
 
         .close {
@@ -98,71 +91,67 @@
             cursor: pointer;
         }
 
-        /* Навигационные кнопки */
         .nav-buttons {
             display: flex;
             justify-content: space-around;
-            align-items: center;
-            background-color: #262221;
             width: 100%;
-            padding: 10px 0;
             position: absolute;
             bottom: 0;
+            background-color: #2b2b2b;
+            padding: 10px 0;
+            border-top: 1px solid #444;
         }
 
         .nav-button {
-            flex: 1;
-            text-align: center;
-            padding: 10px 0;
-            color: #ecf0f1;
-            border-radius: 5px;
-            transition: background-color 0.3s, border 0.3s;
             cursor: pointer;
-            position: relative;
+            color: #ecf0f1;
+            text-align: center;
+            padding: 10px;
+            transition: background-color 0.3s;
         }
 
         .nav-button:hover {
-            background-color: rgba(236, 240, 241, 0.2);
-        }
-
-        .nav-button:active {
-            color: yellow; /* Цвет текста при нажатии */
-            text-shadow: 0 0 5px yellow; /* Эффект свечения текста */
+            background-color: rgba(255, 255, 255, 0.1);
         }
 
         .nav-button img {
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             display: block;
-            margin: 0 auto 5px;
+            margin: 0 auto;
         }
 
-        /* Адаптивный дизайн */
-        @media (max-width: 600px) {
-            header {
-                flex-direction: row;
-                justify-content: space-between;
-            }
-
-            .avatar {
-                width: 30px;
-                height: 30px;
-            }
-
-            .coin-icon {
-                width: 18px;
-                height: 18px;
-            }
-
-            #usercard {
-                width: 90%;
-                padding: 10px;
-            }
+        /* Loading Screen */
+        .loading-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #1c1c1c;
+            color: #f0f0f0;
+            z-index: 10;
+            text-align: center;
         }
+
+        .loading-screen img {
+            width: 150px;
+            margin-bottom: 20px;
+        }
+        
     </style>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
+    <div id="loadingScreen" class="loading-screen">
+        <img src="https://example.com/loading-image.png" alt="Загрузка..."> <!-- Замените на актуальное изображение -->
+        <h2>Данные недоступны</h2>
+    </div>
+
     <header>
         <img id="userAvatar" class="avatar" alt="Avatar">
         <div class="balance">
@@ -190,19 +179,19 @@
 
     <!-- Нижние кнопки -->
     <div class="nav-buttons">
-        <div class="nav-button">
+        <div class="nav-button" id="shopButton">
             <img src="https://img.icons8.com/ios-filled/50/2c3e50/store.png" alt="Магазин">
             Магазин
         </div>
-        <div class="nav-button">
+        <div class="nav-button" id="earnButton">
             <img src="https://img.icons8.com/ios-filled/50/2c3e50/cash-in-hand.png" alt="Заработать">
             Заработать
         </div>
-        <div class="nav-button">
+        <div class="nav-button" id="bonusButton">
             <img src="https://img.icons8.com/ios-filled/50/2c3e50/gift.png" alt="Бонусы">
             Бонусы
         </div>
-        <div class="nav-button">
+        <div class="nav-button" id="moreButton">
             <img src="https://img.icons8.com/ios-filled/50/2c3e50/more.png" alt="Другое">
             Другое
         </div>
@@ -228,6 +217,8 @@
                 <p><strong>Пользователь:</strong> ${user.username || 'Не указан'}</p>
                 <p><strong>Баланс:</strong> ${user.balance} ₽</p>
             `;
+            userCard.style.display = 'block'; // Show user card
+            document.getElementById('loadingScreen').style.display = 'none'; // Hide loading screen
         }
 
         async function getUserData() {
@@ -253,28 +244,30 @@
             });
 
             if (response.ok) {
-                const user = await response.json();
-                displayUserData(user);
+                const data = await response.json();
+                displayUserData(data);
             } else {
-                alert('Ошибка загрузки данных пользователя.');
+                console.error('Ошибка при получении данных пользователя');
+                document.getElementById('loadingScreen').style.display = 'none'; // Hide loading screen
+                alert('Не удалось загрузить данные пользователя');
             }
         }
 
-        // Открытие модального окна профиля
-        const userAvatar = document.getElementById('userAvatar');
-        const modal = document.getElementById('profileModal');
-        const closeModal = document.getElementById('closeModal');
+        document.getElementById('shopButton').onclick = () => alert('Открытие магазина...');
+        document.getElementById('earnButton').onclick = () => alert('Заработок активирован...');
+        document.getElementById('bonusButton').onclick = () => alert('Показ бонусов...');
+        document.getElementById('moreButton').onclick = () => alert('Дополнительные функции...');
 
-        userAvatar.addEventListener('click', () => {
-            modal.style.display = 'flex';
-        });
+        document.getElementById('usercard').onclick = function() {
+            document.getElementById('profileModal').style.display = 'block';
+        };
 
-        closeModal.addEventListener('click', () => {
-            modal.style.display = 'none';
-        });
+        document.getElementById('closeModal').onclick = function() {
+            document.getElementById('profileModal').style.display = 'none';
+        };
 
-        // Закрыть модальное окно при клике вне его
         window.onclick = function(event) {
+            const modal = document.getElementById('profileModal');
             if (event.target === modal) {
                 modal.style.display = 'none';
             }
