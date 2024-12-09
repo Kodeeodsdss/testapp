@@ -1,232 +1,138 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Профиль пользователя</title>
+    <meta charset="UTF-8"> <!-- Кодировка документа -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Подгонка под размеры экрана устройства -->
+    
+    <script src="https://telegram.org/js/telegram-web-app.js"></script> <!-- Подключение библиотеки Telegram Web App -->
+    
+    <title>Telegram Web App</title> <!-- Заголовок страницы -->
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #1c1c1c;
-            color: #f0f0f0;
+        /* CSS для стилизации элементов */
+        .loading-screen {
+            display: flex; /* Используем флексбокс для центрирования содержимого */
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            height: 100vh; /* Высота на весь экран */
+            background: #f0f0f0; /* Фоновый цвет во время загрузки */
+        }
+        /* Положение для аватара с кнопкой профиля */
+        .avatar-container {
+            position: relative; /* Относительное позиционирование для блока с аватаром */
+        }
+
+        .profile-button {
+            display: none; /* Скрыть кнопку по умолчанию */
+            position: absolute; /* Абсолютное позиционирование относительно контейнера */
+            top: 0; /* Положение сверху */
+            left: 0; /* Положение слева */
+            background-color: #3b5998; /* Фоновый цвет кнопки */
+            color: white; /* Цвет текста кнопки */
+            padding: 5px 10px; /* Отступы кнопки */
+            border-radius: 5px; /* Скругление углов */
+            cursor: pointer; /* Изменение курсора на указатель */
+        }
+
+        .nav-buttons { /* Стили для панели навигации */
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            position: relative;
+            justify-content: space-around; /* Отступы между кнопками */
+            margin-top: 20px; 
         }
-
-        header {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            background-color: #2b2b2b;
-            border-bottom: 1px solid #444;
-        }
-
-        .avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: 2px solid white;
-        }
-
-        .balance {
-            display: flex;
-            align-items: center;
-        }
-
-        .coin-icon {
-            width: 25px;
-            margin-right: 5px;
-        }
-
-        #usercard {
-            width: 90%;
-            max-width: 400px;
-            padding: 20px;
-            text-align: center;
-            background-color: #2b2b2b;
-            border-radius: 10px;
-            margin-top: 20px;
-            display: none; /* Initially hidden */
-        }
-
+      
         .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            padding-top: 60px;
+            display: none; /* Модальное окно скрыто по умолчанию */
+            position: fixed; /* Фиксированное позиционирование */
+            z-index: 1; /* Положение выше других элементов */
+            left: 0; 
+            top: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0, 0, 0, 0.4); /* Полупрозрачный фон */
         }
 
         .modal-content {
-            background-color: #fefefe;
-            margin: 5% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            color: black;
+            background-color: #fff; /* Цвет фона для содержимого модального окна */
+            margin: 15% auto; /* Центрирование модального окна */
+            padding: 20px; 
+            border: 1px solid #888; 
+            width: 80%; 
         }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .nav-buttons {
-            display: flex;
-            justify-content: space-around;
-            width: 100%;
-            position: absolute;
-            bottom: 0;
-            background-color: #2b2b2b;
-            padding: 10px 0;
-            border-top: 1px solid #444;
-        }
-
-        .nav-button {
-            cursor: pointer;
-            color: #ecf0f1;
-            text-align: center;
-            padding: 10px;
-            transition: background-color 0.3s;
-        }
-
-        .nav-button:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .nav-button img {
-            width: 20px;
-            height: 20px;
-            display: block;
-            margin: 0 auto;
-        }
-
-        /* Loading Screen */
-        .loading-screen {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #1c1c1c;
-            color: #f0f0f0;
-            z-index: 10;
-            text-align: center;
-        }
-
-        .loading-screen img {
-            width: 150px;
-            margin-bottom: 20px;
-        }
-        
     </style>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
     <div id="loadingScreen" class="loading-screen">
-        <img src="https://example.com/loading-image.png" alt="Загрузка..."> <!-- Замените на актуальное изображение -->
-        <h2>Данные недоступны</h2>
+        <img src="https://example.com/loading-image.png" alt="Загрузка..."> <!-- Изображение загрузки -->
+        <h2>Загрузка данных...</h2> <!-- Текст, отображаемый во время загрузки -->
     </div>
 
     <header>
-        <img id="userAvatar" class="avatar" alt="Avatar">
-        <div class="balance">
-            <img src="https://img.icons8.com/ios-filled/50/ffffff/coin-dollar.png" class="coin-icon" alt="Coin">
-            <span id="userBalance">0 ₽</span>
+        <div class="avatar-container"> <!-- Контейнер для аватара -->
+            <img id="userAvatar" class="avatar" alt="Avatar" src="https://via.placeholder.com/80"> <!-- Аватар пользователя -->
+            <div id="profileButton" class="profile-button">Профиль</div> <!-- Кнопка для открытия профиля -->
+        </div>
+        <div class="balance"> <!-- Блок с отображением баланса -->
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/coin-dollar.png" class="coin-icon" alt="Coin"> <!-- Иконка монеты -->
+            <span id="userBalance">0 ₽</span> <!-- Значение баланса -->
         </div>
     </header>
 
-    <div id="usercard">Загрузка данных...</div>
+    <div id="usercard">Загрузка данных...</div> <!-- Блок для отображения данных пользователя -->
 
     <!-- Модальное окно профиля -->
     <div id="profileModal" class="modal">
         <div class="modal-content">
-            <span class="close" id="closeModal">&times;</span>
-            <h2>Профиль пользователя</h2>
+            <span class="close" id="closeModal">&times;</span> <!-- Кнопка закрытия модального окна -->
+            <h2>Профиль пользователя</h2> <!-- Заголовок модального окна -->
             <div>
-                <img src="" id="profileAvatar" alt="Avatar" style="width: 80px; height: 80px; border-radius: 50%;">
+                <img src="" id="profileAvatar" alt="Avatar" style="width: 80px; height: 80px; border-radius: 50%;"> <!-- Аватар в модальном окне -->
             </div>
-            <p><strong>Имя:</strong> <span id="profileName"></span></p>
-            <p><strong>Фамилия:</strong> <span id="profileLastName"></span></p>
-            <p><strong>ID:</strong> <span id="profileId"></span></p>
-            <p><strong>Пользователь:</strong> <span id="profileUsername"></span></p>
+
+            <p><strong>Фамилия:</strong> <span id="profileLastName"></span></p> <!-- Фамилия пользователя -->
+            <p><strong>ID:</strong> <span id="profileId"></span></p> <!-- ID пользователя -->
+            <p><strong>Пользователь:</strong> <span id="profileUsername"></span></p> <!-- Имя пользователя в системе -->
         </div>
     </div>
 
-    <!-- Нижние кнопки -->
+    <!-- Нижние кнопки навигации -->
     <div class="nav-buttons">
-        <div class="nav-button" id="shopButton">
-            <img src="https://img.icons8.com/ios-filled/50/2c3e50/store.png" alt="Магазин">
-            Магазин
-        </div>
-        <div class="nav-button" id="earnButton">
-            <img src="https://img.icons8.com/ios-filled/50/2c3e50/cash-in-hand.png" alt="Заработать">
-            Заработать
-        </div>
-        <div class="nav-button" id="bonusButton">
-            <img src="https://img.icons8.com/ios-filled/50/2c3e50/gift.png" alt="Бонусы">
-            Бонусы
-        </div>
-        <div class="nav-button" id="moreButton">
-            <img src="https://img.icons8.com/ios-filled/50/2c3e50/more.png" alt="Другое">
-            Другое
-        </div>
+        <div class="nav-button" id="shopButton">Магазин</div> <!-- Кнопка "Магазин" -->
+        <div class="nav-button" id="earnButton">Заработать</div> <!-- Кнопка "Заработать" -->
+        <div class="nav-button" id="bonusButton">Бонусы</div> <!-- Кнопка "Бонусы" -->
+        <div class="nav-button" id="moreButton">Другое</div> <!-- Кнопка "Другое" -->
     </div>
 
     <script>
-        const tg = window.Telegram.WebApp;
+        const tg = window.Telegram.WebApp; // Инициализация объекта для взаимодействия с Telegram Web App
 
+        // Получаем и отображаем данные пользователя
         async function displayUserData(user) {
-            document.getElementById('userAvatar').src = user.avatar || 'https://via.placeholder.com/80';
-            document.getElementById('userBalance').innerText = `${user.balance} ₽`;
-            document.getElementById('profileAvatar').src = user.avatar || 'https://via.placeholder.com/80';
-            document.getElementById('profileName').innerText = user.firstName;
-            document.getElementById('profileLastName').innerText = user.lastName || '';
-            document.getElementById('profileId').innerText = user.userId;
-            document.getElementById('profileUsername').innerText = user.username || 'Не указан';
+            document.getElementById('userAvatar').src = user.avatar || 'https://via.placeholder.com/80'; // Установка аватара пользователя
+            document.getElementById('userBalance').innerText = `${user.balance} ₽`; // Отображение баланса 
+            document.getElementById('profileAvatar').src = user.avatar || 'https://via.placeholder.com/80'; // Установка аватара в модальном окне
+            document.getElementById('profileName').innerText = user.firstName; // Имя в модальном окне
+            document.getElementById('profileLastName').innerText = user.lastName || ''; // Фамилия в модальном окне
+            document.getElementById('profileId').innerText = user.userId; // ID пользователя в модальном окне
+            document.getElementById('profileUsername').innerText = user.username || 'Не указан'; // Имя пользователя
 
-            const userCard = document.getElementById('usercard');
+            const userCard = document.getElementById('usercard'); // Блок для отображения данных пользователя
             userCard.innerHTML = `
-                <img src="${user.avatar}" alt="Avatar">
-                <h3>${user.firstName} ${user.lastName || ''}</h3>
-                <p><strong>ID:</strong> ${user.userId}</p>
-                <p><strong>Пользователь:</strong> ${user.username || 'Не указан'}</p>
-                <p><strong>Баланс:</strong> ${user.balance} ₽</p>
+                <img src="${user.avatar || 'https://via.placeholder.com/80'}" alt="Avatar"> <!-- Аватар в карточке -->
+                <h3>${user.firstName} ${user.lastName || ''}</h3> <!-- Имя и фамилия в карточке -->
+                <p><strong>Пользователь:</strong> ${user.username || 'Не указан'}</p> <!-- Имя пользователя -->
+                <p><strong>Баланс:</strong> ${user.balance} ₽</p> <!-- Баланс пользователя -->
             `;
-            userCard.style.display = 'block'; // Show user card
-            document.getElementById('loadingScreen').style.display = 'none'; // Hide loading screen
+            userCard.style.display = 'block'; // Показываем карточку пользователя
+            document.getElementById('loadingScreen').style.display = 'none'; // Скрываем экран загрузки
         }
 
+        // Получение данных пользователя
         async function getUserData() {
-            const userId = tg.initDataUnsafe.user.id;
-            const firstName = tg.initDataUnsafe.user.first_name;
-            const lastName = tg.initDataUnsafe.user.last_name || '';
-            const username = tg.initDataUnsafe.user.username || '';
-            const avatar = tg.initDataUnsafe.user.photo_url || 'https://via.placeholder.com/80';
+            const userId = tg.initDataUnsafe.user.id; // Получение ID пользователя
+            const firstName = tg.initDataUnsafe.user.first_name; // Получение имени пользователя
+            const lastName = tg.initDataUnsafe.user.last_name || ''; // Получение фамилии пользователя
+            const username = tg.initDataUnsafe.user.username || ''; // Получение имени пользователя в системе
+            const avatar = tg.initDataUnsafe.user.photo_url || 'https://via.placeholder.com/80'; // Получение URL аватара
 
             const userData = {
                 userId,
@@ -237,43 +143,47 @@
                 balance: 1000 // Начальный баланс
             };
 
-            const response = await fetch('http://localhost:5000/user', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(userData)
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                displayUserData(data);
-            } else {
-                console.error('Ошибка при получении данных пользователя');
-                document.getElementById('loadingScreen').style.display = 'none'; // Hide loading screen
-                alert('Не удалось загрузить данные пользователя');
-            }
+            await displayUserData(userData); // Отображение данных пользователя
         }
 
-        document.getElementById('shopButton').onclick = () => alert('Открытие магазина...');
-        document.getElementById('earnButton').onclick = () => alert('Заработок активирован...');
-        document.getElementById('bonusButton').onclick = () => alert('Показ бонусов...');
-        document.getElementById('moreButton').onclick = () => alert('Дополнительные функции...');
+        document.addEventListener('DOMContentLoaded', getUserData); // Получение данных пользователя после загрузки страницы
 
+        // Обработка нажатия на кнопки
+        document.getElementById('shopButton').onclick = () => alert('Открытие магазина...'); // Уведомление при нажатии "Магазин"
+        document.getElementById('earnButton').onclick = () => alert('Заработок активирован...'); // Уведомление при нажатии "Заработать"
+
+        document.getElementById('moreButton').onclick = () => alert('Дополнительные функции...'); // Уведомление при нажатии "Другое"
+
+        // Открытие модального окна профиля при нажатии на карточку пользователя
         document.getElementById('usercard').onclick = function() {
-            document.getElementById('profileModal').style.display = 'block';
+            document.getElementById('profileModal').style.display = 'block'; // Показываем модальное окно при клике
         };
 
+        // Закрытие модального окна при нажатии на кнопку закрытия
         document.getElementById('closeModal').onclick = function() {
-            document.getElementById('profileModal').style.display = 'none';
+            document.getElementById('profileModal').style.display = 'none'; // Скрываем модальное окно
         };
 
+        // Закрытие модального окна при клике вне области модального окна
         window.onclick = function(event) {
-            const modal = document.getElementById('profileModal');
+            const modal = document.getElementById('profileModal'); // Получаем модальное окно
             if (event.target === modal) {
-                modal.style.display = 'none';
+                modal.style.display = 'none'; // Скрываем модальное окно при клике вне его
             }
         };
 
-        getUserData();
+        // Добавление события нажав на аватар, чтобы показать кнопку "Профиль"
+        const userAvatar = document.getElementById('userAvatar');
+        userAvatar.onclick = function() {
+            const profileButton = document.getElementById('profileButton'); // Получаем кнопку профиля
+            profileButton.style.display = 'block'; // Показываем кнопку при нажатии на аватар
+        };
+
+        // Скрыть кнопку профиля при странном повторном нажатии
+        document.getElementById('userAvatar').addEventListener('click', function() {
+            const profileButton = document.getElementById('profileButton'); // Получаем кнопку профиля
+            profileButton.style.display = profileButton.style.display === 'block' ? 'none' : 'block'; // Сменяем видимость кнопки
+        });
     </script>
 </body>
 </html>
