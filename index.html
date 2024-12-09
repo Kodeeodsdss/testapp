@@ -7,10 +7,10 @@
     <title>Telegram Web App</title>
     <style>
         body {
-            font-family: Arial, sans-serif; /* Универсальный шрифт */
-            margin: 0; /* Убираем отступы по умолчанию */
+            font-family: 'Arial', sans-serif; /* Универсальный шрифт */
+            margin: 0;
             padding: 0;
-            background: #f8f9fa; /* Светлый фон для страницы */
+            background: #f8f9fa; /* Светлый фон */
         }
         
         .loading-screen {
@@ -20,66 +20,68 @@
             justify-content: center;
             height: 100vh; /* Высота экрана */
             background: #ffffff; /* Фоновый цвет во время загрузки */
-            text-align: center; /* Центрирование текста */
         }
         
         header {
             background: #007bff; /* Цвет фона заголовка */
-            color: #ffffff; /* Цвет текста заголовка */
-            padding: 15px; /* Отступы вокруг заголовка */
-            display: flex; /* Размещаем аватарку и баланс горизонтально */
-            align-items: center; /* Вертикальное центрирование */
+            color: #ffffff; 
+            padding: 15px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; /* Центрирование */
             position: relative; /* Для кнопки профиля */
         }
 
         .avatar-container {
             position: relative; /* Для позиционирования кнопки профиля */
-            margin-right: 15px; /* Отступ справа от аватара */
+            margin-right: 15px; 
         }
 
         .avatar-container img {
-            width: 60px; /* Ширина аватара */
-            height: 60px; /* Высота аватара */
-            border-radius: 50%; /* Круглая форма аватара */
+            width: 80px; 
+            height: 80px; 
+            border-radius: 50%; 
+            cursor: pointer; /* Указатель при наведении */
         }
 
         .profile-button {
             display: none; /* Скрываем кнопку профиля по умолчанию */
             position: absolute;
-            top: 5px; /* Отступ сверху */
-            left: 5px; /* Отступ слева */
+            top: 70px; /* Отступ сверху от аватара */
+            left: 0; 
             background-color: #fff; /* Белый фон для кнопки */
             color: #007bff; /* Цвет текста кнопки */
             padding: 5px 10px; /* Отступы кнопки */
-            border-radius: 5px; /* Скругление углов */
+            border-radius: 5px; 
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Тень вокруг кнопки */
-            cursor: pointer; /* Указатель при наведении */
-            font-size: 0.8em; /* Размер шрифта для кнопки */
+            cursor: pointer; 
+            font-size: 0.8em; 
+            transition: background 0.3s;
         }
 
-        .balance {
-            font-size: 1.2em; /* Размер шрифта для баланса */
+        .profile-button:hover {
+            background: #f1f1f1; /* Светлый цвет при наведении */
         }
 
         .nav-buttons {
-            display: flex; /* Используем флексбокс для расположения кнопок */
-            justify-content: space-around; /* Равномерное распределение кнопок */
-            margin-top: 20px; /* Отступ сверху */
-            padding: 10px; /* Внутренний отступ */
-            background: #ffffff; /* Белый фон для кнопок */
-            border-radius: 8px; /* Скругление углов */
+            display: flex; 
+            justify-content: space-around; 
+            margin-top: auto; /* Используем auto для выравнивания */
+            padding: 10px; 
+            background: #ffffff; 
+            border-top: 1px solid #e0e0e0; /* Линия сверху для разделения */
         }
 
         .nav-button {
-            flex: 1; /* Занять равную часть */
-            margin: 0 5px; /* Отступы между кнопками */
-            text-align: center; /* Центрирование текста */
-            padding: 10px; /* Внутренние отступы */
-            background: #007bff; /* Цвет фона */
-            color: #ffffff; /* Цвет текста */
-            border-radius: 5px; /* Скругленные углы */
-            cursor: pointer; /* Указатель при наведении */
-            transition: background 0.3s; /* Плавный переход цвета */
+            flex: 1; 
+            margin: 0 5px; 
+            text-align: center; 
+            padding: 15px; 
+            background: #007bff; 
+            color: #ffffff; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            transition: background 0.3s; 
         }
 
         .nav-button:hover {
@@ -87,34 +89,22 @@
         }
 
         .modal {
-            display: none; /* Скрыто по умолчанию */
-            position: fixed;
-            z-index: 1000; /* На переднем плане */
-            left: 0;
-            top: 0;
-            width: 100%; /* На всю ширину */
-            height: 100%; /* На всю высоту */
-            background-color: rgba(0, 0, 0, 0.5); /* Полупрозрачный фон */
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 0; 
+            top: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0, 0, 0, 0.5); 
         }
 
         .modal-content {
-            background-color: #ffffff; /* Белый фон для модального окна */
-            margin: 15% auto; /* Центрирование */
-
-            width: 90%; /* Ширина для мобильных устройств */
-            border-radius: 10px; /* Скругление углов */
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Тень */
-        }
-
-        @media (min-width: 600px) {
-            .avatar-container img {
-                width: 80px; /* Увеличиваем размер аватара на больших экранах */
-                height: 80px; /* Увеличиваем высоту аватара на больших экранах */
-            }
-
-            .nav-button {
-                padding: 15px; /* Увеличиваем отступы для больших экранов */
-            }
+            background-color: #ffffff; 
+            margin: 15% auto; 
+            width: 90%; 
+            border-radius: 10px; 
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); 
         }
     </style>
 </head>
@@ -129,13 +119,8 @@
             <img id="userAvatar" class="avatar" alt="Avatar" src="https://via.placeholder.com/80"> <!-- Аватар пользователя -->
             <div id="profileButton" class="profile-button">Профиль</div> <!-- Кнопка для открытия профиля -->
         </div>
-        <div class="balance"> <!-- Блок с балансом -->
-            <img src="https://img.icons8.com/ios-filled/50/ffffff/coin-dollar.png" class="coin-icon" alt="Coin"> <!-- Иконка монеты -->
-            <span id="userBalance">0 ₽</span> <!-- Значение баланса -->
-        </div>
     </header>
 
-    <div id="usercard" style="padding: 10px; margin: 10px; background: #ffffff; border-radius: 8px;">Загрузка данных...</div> <!-- Карточка пользователя -->
 
     <!-- Модальное окно профиля -->
     <div id="profileModal" class="modal">
@@ -165,20 +150,18 @@
 
         async function displayUserData(user) {
             document.getElementById('userAvatar').src = user.avatar || 'https://via.placeholder.com/80';
-            document.getElementById('userBalance').innerText = `${user.balance} ₽`;
+            document.getElementById('userBalance').innerText = \`${user.balance} ₽\`;
             document.getElementById('profileAvatar').src = user.avatar || 'https://via.placeholder.com/80';
             document.getElementById('profileName').innerText = user.firstName;
             document.getElementById('profileLastName').innerText = user.lastName || '';
             document.getElementById('profileId').innerText = user.userId;
             document.getElementById('profileUsername').innerText = user.username || 'Не указан';
-
             const userCard = document.getElementById('usercard');
-            userCard.innerHTML = `
-
+            userCard.innerHTML = \`
                 <h3>${user.firstName} ${user.lastName || ''}</h3>
                 <p><strong>Пользователь:</strong> ${user.username || 'Не указан'}</p>
                 <p><strong>Баланс:</strong> ${user.balance} ₽</p>
-            `;
+            \`;
             userCard.style.display = 'block';
             document.getElementById('loadingScreen').style.display = 'none';
         }
@@ -202,20 +185,21 @@
             await displayUserData(userData);
         }
 
-        document.addEventListener('DOMContentLoaded', getUserData); // Получаем данные пользователя после загрузки страницы
+        document.addEventListener('DOMContentLoaded', getUserData); // Получение данных пользователя
         
-        // Обработка нажатия на кнопки
-        document.getElementById('shopButton').onclick = () => alert('Открытие магазина...');
-        document.getElementById('earnButton').onclick = () => alert('Заработок активирован...');
-        document.getElementById('bonusButton').onclick = () => alert('Показ бонусов...');
-        document.getElementById('moreButton').onclick = () => alert('Дополнительные функции...');
-
-        // Открытие модального окна профиля
-        document.getElementById('usercard').onclick = function() {
-            document.getElementById('profileModal').style.display = 'block'; // Отображение модального окна при нажатии
+        // Обработка нажатия на кнопку "Профиль"
+        document.getElementById('userAvatar').onclick = function() {
+            const profileButton = document.getElementById('profileButton'); 
+            profileButton.style.display = profileButton.style.display === 'block' ? 'none' : 'block'; // Смена видимости
         };
 
-        // Закрытие модального окна через кнопку
+        // Открытие модального окна профиля
+        document.getElementById('profileButton').onclick = function() {
+            document.getElementById('profileModal').style.display = 'block'; // Отображение модального окна
+
+        };
+
+        // Закрытие модального окна
         document.getElementById('closeModal').onclick = function() {
             document.getElementById('profileModal').style.display = 'none'; // Скрытие модального окна
         };
@@ -228,12 +212,11 @@
             }
         };
 
-        // Открытие кнопки профиля по нажатию на аватар
-        const userAvatar = document.getElementById('userAvatar');
-        userAvatar.onclick = function() {
-            const profileButton = document.getElementById('profileButton'); 
-            profileButton.style.display = profileButton.style.display === 'block' ? 'none' : 'block'; // Сменяем видимость кнопки
-        };
+        // Обработка нажатия на кнопки навигации
+        document.getElementById('shopButton').onclick = () => alert('Открытие магазина...');
+        document.getElementById('earnButton').onclick = () => alert('Заработок активирован...');
+        document.getElementById('bonusButton').onclick = () => alert('Показ бонусов...');
+        document.getElementById('moreButton').onclick = () => alert('Дополнительные функции...');
     </script>
 </body>
 </html>
