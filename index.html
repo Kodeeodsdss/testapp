@@ -1,69 +1,127 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8"> <!-- Кодировка документа -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Подгонка под размеры экрана устройства -->
-    
-    <script src="https://telegram.org/js/telegram-web-app.js"></script> <!-- Подключение библиотеки Telegram Web App -->
-    
-    <title>Telegram Web App</title> <!-- Заголовок страницы -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>Telegram Web App</title>
     <style>
-        /* CSS для стилизации элементов */
-        .loading-screen {
-            display: flex; /* Используем флексбокс для центрирования содержимого */
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            height: 100vh; /* Высота на весь экран */
-            background: #f0f0f0; /* Фоновый цвет во время загрузки */
+        body {
+            font-family: Arial, sans-serif; /* Универсальный шрифт */
+            margin: 0; /* Убираем отступы по умолчанию */
+            padding: 0;
+            background: #f8f9fa; /* Светлый фон для страницы */
         }
-        /* Положение для аватара с кнопкой профиля */
+        
+        .loading-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh; /* Высота экрана */
+            background: #ffffff; /* Фоновый цвет во время загрузки */
+            text-align: center; /* Центрирование текста */
+        }
+        
+        header {
+            background: #007bff; /* Цвет фона заголовка */
+            color: #ffffff; /* Цвет текста заголовка */
+            padding: 15px; /* Отступы вокруг заголовка */
+            display: flex; /* Размещаем аватарку и баланс горизонтально */
+            align-items: center; /* Вертикальное центрирование */
+            position: relative; /* Для кнопки профиля */
+        }
+
         .avatar-container {
-            position: relative; /* Относительное позиционирование для блока с аватаром */
+            position: relative; /* Для позиционирования кнопки профиля */
+            margin-right: 15px; /* Отступ справа от аватара */
+        }
+
+        .avatar-container img {
+            width: 60px; /* Ширина аватара */
+            height: 60px; /* Высота аватара */
+            border-radius: 50%; /* Круглая форма аватара */
         }
 
         .profile-button {
-            display: none; /* Скрыть кнопку по умолчанию */
-            position: absolute; /* Абсолютное позиционирование относительно контейнера */
-            top: 0; /* Положение сверху */
-            left: 0; /* Положение слева */
-            background-color: #3b5998; /* Фоновый цвет кнопки */
-            color: white; /* Цвет текста кнопки */
+            display: none; /* Скрываем кнопку профиля по умолчанию */
+            position: absolute;
+            top: 5px; /* Отступ сверху */
+            left: 5px; /* Отступ слева */
+            background-color: #fff; /* Белый фон для кнопки */
+            color: #007bff; /* Цвет текста кнопки */
             padding: 5px 10px; /* Отступы кнопки */
             border-radius: 5px; /* Скругление углов */
-            cursor: pointer; /* Изменение курсора на указатель */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Тень вокруг кнопки */
+            cursor: pointer; /* Указатель при наведении */
+            font-size: 0.8em; /* Размер шрифта для кнопки */
         }
 
-        .nav-buttons { /* Стили для панели навигации */
-            display: flex;
-            justify-content: space-around; /* Отступы между кнопками */
-            margin-top: 20px; 
+        .balance {
+            font-size: 1.2em; /* Размер шрифта для баланса */
         }
-      
+
+        .nav-buttons {
+            display: flex; /* Используем флексбокс для расположения кнопок */
+            justify-content: space-around; /* Равномерное распределение кнопок */
+            margin-top: 20px; /* Отступ сверху */
+            padding: 10px; /* Внутренний отступ */
+            background: #ffffff; /* Белый фон для кнопок */
+            border-radius: 8px; /* Скругление углов */
+        }
+
+        .nav-button {
+            flex: 1; /* Занять равную часть */
+            margin: 0 5px; /* Отступы между кнопками */
+            text-align: center; /* Центрирование текста */
+            padding: 10px; /* Внутренние отступы */
+            background: #007bff; /* Цвет фона */
+            color: #ffffff; /* Цвет текста */
+            border-radius: 5px; /* Скругленные углы */
+            cursor: pointer; /* Указатель при наведении */
+            transition: background 0.3s; /* Плавный переход цвета */
+        }
+
+        .nav-button:hover {
+            background: #0056b3; /* Темнее при наведении */
+        }
+
         .modal {
-            display: none; /* Модальное окно скрыто по умолчанию */
-            position: fixed; /* Фиксированное позиционирование */
-            z-index: 1; /* Положение выше других элементов */
-            left: 0; 
-            top: 0; 
-            width: 100%; 
-            height: 100%; 
-            background-color: rgba(0, 0, 0, 0.4); /* Полупрозрачный фон */
+            display: none; /* Скрыто по умолчанию */
+            position: fixed;
+            z-index: 1000; /* На переднем плане */
+            left: 0;
+            top: 0;
+            width: 100%; /* На всю ширину */
+            height: 100%; /* На всю высоту */
+            background-color: rgba(0, 0, 0, 0.5); /* Полупрозрачный фон */
         }
 
         .modal-content {
-            background-color: #fff; /* Цвет фона для содержимого модального окна */
-            margin: 15% auto; /* Центрирование модального окна */
-            padding: 20px; 
-            border: 1px solid #888; 
-            width: 80%; 
+            background-color: #ffffff; /* Белый фон для модального окна */
+            margin: 15% auto; /* Центрирование */
+
+            width: 90%; /* Ширина для мобильных устройств */
+            border-radius: 10px; /* Скругление углов */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Тень */
+        }
+
+        @media (min-width: 600px) {
+            .avatar-container img {
+                width: 80px; /* Увеличиваем размер аватара на больших экранах */
+                height: 80px; /* Увеличиваем высоту аватара на больших экранах */
+            }
+
+            .nav-button {
+                padding: 15px; /* Увеличиваем отступы для больших экранов */
+            }
         }
     </style>
 </head>
 <body>
     <div id="loadingScreen" class="loading-screen">
         <img src="https://example.com/loading-image.png" alt="Загрузка..."> <!-- Изображение загрузки -->
-        <h2>Загрузка данных...</h2> <!-- Текст, отображаемый во время загрузки -->
+        <h2>Загрузка данных...</h2> <!-- Текст загрузки -->
     </div>
 
     <header>
@@ -71,13 +129,13 @@
             <img id="userAvatar" class="avatar" alt="Avatar" src="https://via.placeholder.com/80"> <!-- Аватар пользователя -->
             <div id="profileButton" class="profile-button">Профиль</div> <!-- Кнопка для открытия профиля -->
         </div>
-        <div class="balance"> <!-- Блок с отображением баланса -->
+        <div class="balance"> <!-- Блок с балансом -->
             <img src="https://img.icons8.com/ios-filled/50/ffffff/coin-dollar.png" class="coin-icon" alt="Coin"> <!-- Иконка монеты -->
             <span id="userBalance">0 ₽</span> <!-- Значение баланса -->
         </div>
     </header>
 
-    <div id="usercard">Загрузка данных...</div> <!-- Блок для отображения данных пользователя -->
+    <div id="usercard" style="padding: 10px; margin: 10px; background: #ffffff; border-radius: 8px;">Загрузка данных...</div> <!-- Карточка пользователя -->
 
     <!-- Модальное окно профиля -->
     <div id="profileModal" class="modal">
@@ -87,7 +145,7 @@
             <div>
                 <img src="" id="profileAvatar" alt="Avatar" style="width: 80px; height: 80px; border-radius: 50%;"> <!-- Аватар в модальном окне -->
             </div>
-
+            <p><strong>Имя:</strong> <span id="profileName"></span></p> <!-- Имя пользователя -->
             <p><strong>Фамилия:</strong> <span id="profileLastName"></span></p> <!-- Фамилия пользователя -->
             <p><strong>ID:</strong> <span id="profileId"></span></p> <!-- ID пользователя -->
             <p><strong>Пользователь:</strong> <span id="profileUsername"></span></p> <!-- Имя пользователя в системе -->
@@ -103,36 +161,34 @@
     </div>
 
     <script>
-        const tg = window.Telegram.WebApp; // Инициализация объекта для взаимодействия с Telegram Web App
+        const tg = window.Telegram.WebApp; // Инициализация Telegram Web App
 
-        // Получаем и отображаем данные пользователя
         async function displayUserData(user) {
-            document.getElementById('userAvatar').src = user.avatar || 'https://via.placeholder.com/80'; // Установка аватара пользователя
-            document.getElementById('userBalance').innerText = `${user.balance} ₽`; // Отображение баланса 
-            document.getElementById('profileAvatar').src = user.avatar || 'https://via.placeholder.com/80'; // Установка аватара в модальном окне
-            document.getElementById('profileName').innerText = user.firstName; // Имя в модальном окне
-            document.getElementById('profileLastName').innerText = user.lastName || ''; // Фамилия в модальном окне
-            document.getElementById('profileId').innerText = user.userId; // ID пользователя в модальном окне
-            document.getElementById('profileUsername').innerText = user.username || 'Не указан'; // Имя пользователя
+            document.getElementById('userAvatar').src = user.avatar || 'https://via.placeholder.com/80';
+            document.getElementById('userBalance').innerText = `${user.balance} ₽`;
+            document.getElementById('profileAvatar').src = user.avatar || 'https://via.placeholder.com/80';
+            document.getElementById('profileName').innerText = user.firstName;
+            document.getElementById('profileLastName').innerText = user.lastName || '';
+            document.getElementById('profileId').innerText = user.userId;
+            document.getElementById('profileUsername').innerText = user.username || 'Не указан';
 
-            const userCard = document.getElementById('usercard'); // Блок для отображения данных пользователя
+            const userCard = document.getElementById('usercard');
             userCard.innerHTML = `
-                <img src="${user.avatar || 'https://via.placeholder.com/80'}" alt="Avatar"> <!-- Аватар в карточке -->
-                <h3>${user.firstName} ${user.lastName || ''}</h3> <!-- Имя и фамилия в карточке -->
-                <p><strong>Пользователь:</strong> ${user.username || 'Не указан'}</p> <!-- Имя пользователя -->
-                <p><strong>Баланс:</strong> ${user.balance} ₽</p> <!-- Баланс пользователя -->
+
+                <h3>${user.firstName} ${user.lastName || ''}</h3>
+                <p><strong>Пользователь:</strong> ${user.username || 'Не указан'}</p>
+                <p><strong>Баланс:</strong> ${user.balance} ₽</p>
             `;
-            userCard.style.display = 'block'; // Показываем карточку пользователя
-            document.getElementById('loadingScreen').style.display = 'none'; // Скрываем экран загрузки
+            userCard.style.display = 'block';
+            document.getElementById('loadingScreen').style.display = 'none';
         }
 
-        // Получение данных пользователя
         async function getUserData() {
-            const userId = tg.initDataUnsafe.user.id; // Получение ID пользователя
-            const firstName = tg.initDataUnsafe.user.first_name; // Получение имени пользователя
-            const lastName = tg.initDataUnsafe.user.last_name || ''; // Получение фамилии пользователя
-            const username = tg.initDataUnsafe.user.username || ''; // Получение имени пользователя в системе
-            const avatar = tg.initDataUnsafe.user.photo_url || 'https://via.placeholder.com/80'; // Получение URL аватара
+            const userId = tg.initDataUnsafe.user.id;
+            const firstName = tg.initDataUnsafe.user.first_name;
+            const lastName = tg.initDataUnsafe.user.last_name || '';
+            const username = tg.initDataUnsafe.user.username || '';
+            const avatar = tg.initDataUnsafe.user.photo_url || 'https://via.placeholder.com/80';
 
             const userData = {
                 userId,
@@ -143,47 +199,41 @@
                 balance: 1000 // Начальный баланс
             };
 
-            await displayUserData(userData); // Отображение данных пользователя
+            await displayUserData(userData);
         }
 
-        document.addEventListener('DOMContentLoaded', getUserData); // Получение данных пользователя после загрузки страницы
-
+        document.addEventListener('DOMContentLoaded', getUserData); // Получаем данные пользователя после загрузки страницы
+        
         // Обработка нажатия на кнопки
-        document.getElementById('shopButton').onclick = () => alert('Открытие магазина...'); // Уведомление при нажатии "Магазин"
-        document.getElementById('earnButton').onclick = () => alert('Заработок активирован...'); // Уведомление при нажатии "Заработать"
+        document.getElementById('shopButton').onclick = () => alert('Открытие магазина...');
+        document.getElementById('earnButton').onclick = () => alert('Заработок активирован...');
+        document.getElementById('bonusButton').onclick = () => alert('Показ бонусов...');
+        document.getElementById('moreButton').onclick = () => alert('Дополнительные функции...');
 
-        document.getElementById('moreButton').onclick = () => alert('Дополнительные функции...'); // Уведомление при нажатии "Другое"
-
-        // Открытие модального окна профиля при нажатии на карточку пользователя
+        // Открытие модального окна профиля
         document.getElementById('usercard').onclick = function() {
-            document.getElementById('profileModal').style.display = 'block'; // Показываем модальное окно при клике
+            document.getElementById('profileModal').style.display = 'block'; // Отображение модального окна при нажатии
         };
 
-        // Закрытие модального окна при нажатии на кнопку закрытия
+        // Закрытие модального окна через кнопку
         document.getElementById('closeModal').onclick = function() {
-            document.getElementById('profileModal').style.display = 'none'; // Скрываем модальное окно
+            document.getElementById('profileModal').style.display = 'none'; // Скрытие модального окна
         };
 
-        // Закрытие модального окна при клике вне области модального окна
+        // Закрытие модального окна при клике вне него
         window.onclick = function(event) {
-            const modal = document.getElementById('profileModal'); // Получаем модальное окно
+            const modal = document.getElementById('profileModal'); 
             if (event.target === modal) {
-                modal.style.display = 'none'; // Скрываем модальное окно при клике вне его
+                modal.style.display = 'none'; // Скрываем модальное окно
             }
         };
 
-        // Добавление события нажав на аватар, чтобы показать кнопку "Профиль"
+        // Открытие кнопки профиля по нажатию на аватар
         const userAvatar = document.getElementById('userAvatar');
         userAvatar.onclick = function() {
-            const profileButton = document.getElementById('profileButton'); // Получаем кнопку профиля
-            profileButton.style.display = 'block'; // Показываем кнопку при нажатии на аватар
-        };
-
-        // Скрыть кнопку профиля при странном повторном нажатии
-        document.getElementById('userAvatar').addEventListener('click', function() {
-            const profileButton = document.getElementById('profileButton'); // Получаем кнопку профиля
+            const profileButton = document.getElementById('profileButton'); 
             profileButton.style.display = profileButton.style.display === 'block' ? 'none' : 'block'; // Сменяем видимость кнопки
-        });
+        };
     </script>
 </body>
 </html>
